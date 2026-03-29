@@ -4,11 +4,11 @@ import static org.dicio.numbers.test.TestUtils.DAY;
 import static org.dicio.numbers.test.TestUtils.HOUR;
 import static org.dicio.numbers.test.TestUtils.MINUTE;
 import static org.dicio.numbers.test.TestUtils.YEAR;
-import static org.dicio.numbers.test.TestUtils.t;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import org.dicio.numbers.ParserFormatter;
+import org.dicio.numbers.unit.Duration;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -23,13 +23,13 @@ public class ExtractDurationTest {
 
     @Test
     public void testExtractDuration() {
-        assertEquals(t(2 * MINUTE + 30),
+        assertEquals(new Duration().plus(2 * MINUTE + 30, java.time.temporal.ChronoUnit.SECONDS),
                 pf.extractDuration("un minuteur de deux minutes et trente secondes").get());
-        assertEquals(t(2 * YEAR),
+        assertEquals(new Duration().plus(2 * YEAR, java.time.temporal.ChronoUnit.SECONDS),
                 pf.extractDuration("il y a deux ans").get());
-        assertEquals(t(23 * HOUR),
+        assertEquals(new Duration().plus(23 * HOUR, java.time.temporal.ChronoUnit.SECONDS),
                 pf.extractDuration("vingt-trois heures").get());
-        assertEquals(t(5 * DAY),
+        assertEquals(new Duration().plus(5 * DAY, java.time.temporal.ChronoUnit.SECONDS),
                 pf.extractDuration("cinq jours").get());
     }
 
