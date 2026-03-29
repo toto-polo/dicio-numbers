@@ -29,14 +29,12 @@ public class ParserParamsTest extends ParserParamsTestBase {
         return new FrenchParser();
     }
 
-    protected void assertNumberFirst(final String s, final boolean preferOrdinal,
-                                     final boolean integerOnly, final Number expectedResult) {
-        assertNumberFirst(s, true, preferOrdinal, integerOnly, expectedResult);
+    protected void assertNumberFirst(final String s, final Number expectedResult) {
+        assertNumberFirst(s, true, F, F, expectedResult);
     }
 
-    protected void assertNumberMixedWithText(final String s, final boolean preferOrdinal,
-                                              final boolean integerOnly, final Object... expectedResults) {
-        assertNumberMixedWithText(s, true, preferOrdinal, integerOnly, expectedResults);
+    protected void assertNumberMixedWithText(final String s, final Object... expectedResults) {
+        assertNumberMixedWithText(s, true, F, F, expectedResults);
     }
 
     protected void assertDurationFirst(final String s, final java.time.Duration expectedResult) {
@@ -79,18 +77,17 @@ public class ParserParamsTest extends ParserParamsTestBase {
 
     @Test
     public void testNumberFirst() {
-        assertNumberFirst("un bonjour",       F, F, n(1, F));
-        assertNumberFirst("dix-neuf euros",   F, F, n(19, F));
-        assertNumberFirst("premier résultat", T, F, n(1, T));
-        assertNumberFirst("premier résultat", F, F, n(1, T));
-        assertNumberFirst("inconnu",          F, F, null);
+        assertNumberFirst("un bonjour",       n(1, F));
+        assertNumberFirst("dix-neuf euros",   n(19, F));
+        assertNumberFirst("premier résultat", n(1, T));
+        assertNumberFirst("inconnu",          null);
     }
 
     @Test
     public void testNumberMixedWithText() {
-        assertNumberMixedWithText("vingt et un et cent soixante-quatre", F, F,
+        assertNumberMixedWithText("vingt et un et cent soixante-quatre",
                 n(21, F), " et ", n(164, F));
-        assertNumberMixedWithText("bonjour trois monde",  F, F, "bonjour ", n(3, F), " monde");
+        assertNumberMixedWithText("bonjour trois monde",  "bonjour ", n(3, F), " monde");
     }
 
     @Test
