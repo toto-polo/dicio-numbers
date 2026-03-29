@@ -70,7 +70,9 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
                     ) {
                         return numberToEdit.divide((1 / multiplier.decimalValue()).toLong())
                     }
-                    return numberToEdit.multiply(multiplier!!)
+                    if (multiplier != null) {
+                        return numberToEdit.multiply(multiplier)
+                    }
                 }
             } else if (denominator.isOrdinal && denominator.moreThan(2)) {
                 return numberToEdit.divide(denominator)
@@ -126,7 +128,10 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
             var magnitude = 0.1
             if (ts[0].value.length > 1 && NumberExtractorUtils.isRawNumber(ts[0])) {
                 for (i in 0 until ts[0].value.length) {
-                    n = n!!.plus((ts[0].value[i].code - '0'.code) * magnitude)
+                    val currentN = n
+                    if (currentN != null) {
+                        n = currentN.plus((ts[0].value[i].code - '0'.code) * magnitude)
+                    }
                     magnitude /= 10.0
                 }
                 ts.movePositionForwardBy(1)
@@ -136,7 +141,10 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
                         || (ts[0].value.length == 1 && NumberExtractorUtils.isRawNumber(ts[0])
                                 && !ts[1].hasCategory("ordinal_suffix"))
                     ) {
-                        n = n!!.plus(ts[0].number!!.multiply(magnitude))
+                        val currentN = n
+                        if (currentN != null) {
+                            n = currentN.plus(ts[0].number!!.multiply(magnitude))
+                        }
                         magnitude /= 10.0
                     } else {
                         break
@@ -154,7 +162,10 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
             if (denominator == null) {
                 ts.movePositionForwardBy(-separatorLength)
             } else {
-                return n!!.divide(denominator)
+                val currentN = n
+                if (currentN != null) {
+                    return currentN.divide(denominator)
+                }
             }
         }
 
@@ -182,13 +193,19 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
                     && ts[1].value.length == 3
                     && NumberExtractorUtils.isRawNumber(ts[1])
                 ) {
-                    n = n!!.multiply(1000).plus(ts[1].number)
+                    val currentN = n
+                    if (currentN != null) {
+                        n = currentN.multiply(1000).plus(ts[1].number)
+                    }
                     ts.movePositionForwardBy(2)
                 }
                 if (ts[0].hasCategory("ordinal_suffix")) {
                     if (allowOrdinal) {
                         ts.movePositionForwardBy(1)
-                        return n!!.withOrdinal(true)
+                        val currentN = n
+                        if (currentN != null) {
+                            return currentN.withOrdinal(true)
+                        }
                     } else {
                         ts.position = originalPosition
                         return null
