@@ -9,7 +9,6 @@ import java.util.function.Function;
 
 import static org.dicio.numbers.test.TestUtils.F;
 import static org.dicio.numbers.test.TestUtils.T;
-import static org.dicio.numbers.test.TestUtils.n;
 import static org.dicio.numbers.test.TestUtils.numberDeduceType;
 import static org.junit.Assert.assertEquals;
 
