@@ -1,8 +1,6 @@
 package org.dicio.numbers.lang.fr;
 
-import static org.dicio.numbers.test.TestUtils.DAY;
 import static org.dicio.numbers.test.TestUtils.F;
-import static org.dicio.numbers.test.TestUtils.HOUR;
 import static org.dicio.numbers.test.TestUtils.MINUTE;
 import static org.dicio.numbers.test.TestUtils.T;
 import static org.dicio.numbers.test.TestUtils.YEAR;
@@ -19,7 +17,6 @@ import org.dicio.numbers.unit.Number;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
