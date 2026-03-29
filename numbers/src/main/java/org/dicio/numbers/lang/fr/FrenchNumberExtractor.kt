@@ -93,7 +93,7 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
     }
 
     fun numberSuffixMultiplierInteger(): Number? {
-        return if (ts[0].hasCategory("suffix_multiplier") && ts[0].number!!.isInteger) {
+        return if (ts[0].hasCategory("suffix_multiplier") && ts[0].number?.isInteger == true) {
             ts.movePositionForwardBy(1)
             ts[-1].number
         } else {
@@ -128,10 +128,7 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
             var magnitude = 0.1
             if (ts[0].value.length > 1 && NumberExtractorUtils.isRawNumber(ts[0])) {
                 for (i in 0 until ts[0].value.length) {
-                    val currentN = n
-                    if (currentN != null) {
-                        n = currentN.plus((ts[0].value[i].code - '0'.code) * magnitude)
-                    }
+                    n = n?.plus((ts[0].value[i].code - '0'.code) * magnitude)
                     magnitude /= 10.0
                 }
                 ts.movePositionForwardBy(1)
@@ -141,9 +138,9 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
                         || (ts[0].value.length == 1 && NumberExtractorUtils.isRawNumber(ts[0])
                                 && !ts[1].hasCategory("ordinal_suffix"))
                     ) {
-                        val currentN = n
-                        if (currentN != null) {
-                            n = currentN.plus(ts[0].number!!.multiply(magnitude))
+                        val digitVal = ts[0].number
+                        if (digitVal != null) {
+                            n = n?.plus(digitVal.multiply(magnitude))
                         }
                         magnitude /= 10.0
                     } else {
@@ -162,10 +159,7 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
             if (denominator == null) {
                 ts.movePositionForwardBy(-separatorLength)
             } else {
-                val currentN = n
-                if (currentN != null) {
-                    return currentN.divide(denominator)
-                }
+                n = n?.divide(denominator)
             }
         }
 
@@ -193,19 +187,16 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
                     && ts[1].value.length == 3
                     && NumberExtractorUtils.isRawNumber(ts[1])
                 ) {
-                    val currentN = n
-                    if (currentN != null) {
-                        n = currentN.multiply(1000).plus(ts[1].number)
+                    val groupVal = ts[1].number
+                    if (groupVal != null) {
+                        n = n?.multiply(1000)?.plus(groupVal)
                     }
                     ts.movePositionForwardBy(2)
                 }
                 if (ts[0].hasCategory("ordinal_suffix")) {
                     if (allowOrdinal) {
                         ts.movePositionForwardBy(1)
-                        val currentN = n
-                        if (currentN != null) {
-                            return currentN.withOrdinal(true)
-                        }
+                        n = n?.withOrdinal(true)
                     } else {
                         ts.position = originalPosition
                         return null
@@ -239,7 +230,7 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
         val ordinal = ts[nextNotIgnore].hasCategory("ordinal")
         if (ts[nextNotIgnore].hasCategory("multiplier") && (allowOrdinal || !ordinal)) {
             val multiplier = ts[nextNotIgnore].number
-            if (multiplier!!.lessThan(lastMultiplier)) {
+            if (multiplier != null && multiplier.lessThan(lastMultiplier)) {
                 ts.movePositionForwardBy(nextNotIgnore + 1)
                 return if (groupValue == null) {
                     multiplier.withOrdinal(ordinal)
@@ -279,7 +270,7 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
 
             when {
                 ts[nextNotIgnore].hasCategory("digit") -> {
-                    val digitValue = ts[nextNotIgnore].number!!.integerValue()
+                    val digitValue = ts[nextNotIgnore].number?.integerValue() ?: break
 
                     // French special: "quatre" (4) + "vingt(s)" (20) = 80
                     if (digitValue == 4L && ten < 0 && digit < 0 && hundred < 0) {
@@ -287,7 +278,7 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
                         ts.movePositionForwardBy(nextNotIgnore + 1)
                         val nextIdx2 = ts.indexOfWithoutCategory("ignore", 0)
                         if (ts[nextIdx2].hasCategory("tens")
-                            && ts[nextIdx2].number!!.integerValue() == 20L
+                            && ts[nextIdx2].number?.integerValue() == 20L
                         ) {
                             ts.movePositionForwardBy(nextIdx2 + 1)
                             // Now check for additional digit or teen (81-99)
@@ -295,13 +286,13 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
                             val addCat = when {
                                 ts[nextIdx3].hasCategory("teen") -> "teen"
                                 ts[nextIdx3].hasCategory("digit")
-                                        && !ts[nextIdx3].isNumberEqualTo(0) -> "digit"
+                                        && ts[nextIdx3].isNumberEqualTo(0).not() -> "digit"
                                 else -> null
                             }
                             if (addCat != null) {
                                 ts.movePositionForwardBy(nextIdx3 + 1)
                                 return Number(
-                                    80L + ts[-1].number!!.integerValue(),
+                                    80L + (ts[-1].number?.integerValue() ?: 0L),
                                     ts[-1].hasCategory("ordinal") && allowOrdinal
                                 )
                             }
@@ -316,7 +307,7 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
                         ts.position = savedPos
                     }
 
-                    if (digit < 0 && (!ts[nextNotIgnore].isNumberEqualTo(0)
+                    if (digit < 0 && (ts[nextNotIgnore].isNumberEqualTo(0).not()
                                 || (ten < 0 && hundred < 0))
                     ) {
                         digit = digitValue
@@ -325,13 +316,13 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
 
                 ts[nextNotIgnore].hasCategory("teen") -> {
                     if (ten < 0 && digit < 0) {
-                        ten = ts[nextNotIgnore].number!!.integerValue()
+                        ten = ts[nextNotIgnore].number?.integerValue() ?: break
                         digit = 0
                     } else break
                 }
 
                 ts[nextNotIgnore].hasCategory("tens") -> {
-                    val tensValue = ts[nextNotIgnore].number!!.integerValue()
+                    val tensValue = ts[nextNotIgnore].number?.integerValue() ?: break
 
                     // French special: "soixante" (60) + teen (10-19) = 70-79
                     if (tensValue == 60L && ten < 0 && digit < 0) {
@@ -339,7 +330,7 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
                         ts.movePositionForwardBy(nextNotIgnore + 1)
                         val nextIdx2 = ts.indexOfWithoutCategory("ignore", 0)
                         if (ts[nextIdx2].hasCategory("teen")) {
-                            val teenVal = ts[nextIdx2].number!!.integerValue()
+                            val teenVal = ts[nextIdx2].number?.integerValue() ?: -1L
                             if (teenVal >= 10) {
                                 ts.movePositionForwardBy(nextIdx2 + 1)
                                 ten = 60 + teenVal
@@ -373,8 +364,8 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
                 }
 
                 NumberExtractorUtils.isRawNumber(ts[nextNotIgnore]) -> {
-                    val rawNumber = ts[nextNotIgnore].number
-                    if (rawNumber!!.isDecimal) break
+                    val rawNumber = ts[nextNotIgnore].number ?: break
+                    if (rawNumber.isDecimal) break
 
                     if (!allowOrdinal && ts[nextNotIgnore + 1].hasCategory("ordinal_suffix")) break
 
