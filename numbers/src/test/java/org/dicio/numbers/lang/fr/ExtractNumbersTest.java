@@ -42,8 +42,8 @@ public class ExtractNumbersTest extends WithTokenizerTestBase {
                 finalTokenStreamPosition, (enp) -> enp.numberInteger(allowOrdinal));
     }
 
-    private void assertNumberIntegerNull(final String s, final boolean allowOrdinal) {
-        assertNumberFunctionNull(s, (enp) -> enp.numberInteger(allowOrdinal));
+    private void assertNumberIntegerNull(final String s) {
+        assertNumberFunctionNull(s, (enp) -> enp.numberInteger(F));
     }
 
     @Test
@@ -57,8 +57,8 @@ public class ExtractNumbersTest extends WithTokenizerTestBase {
         assertNumberInteger("quatre-vingts",               F, 80,     F, 1);
         assertNumberInteger("quatre-vingt-trois",          F, 83,     F, 1);
         assertNumberInteger("premier",                     T, 1,      T, 1);
-        assertNumberIntegerNull("premier",                 F);
-        assertNumberIntegerNull("bonjour",                 F);
+        assertNumberIntegerNull("premier");
+        assertNumberIntegerNull("bonjour");
     }
 
     @Test
