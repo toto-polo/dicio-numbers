@@ -187,14 +187,14 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
                 ) {
                     val groupVal = ts[1].number
                     if (groupVal != null) {
-                        n = n.multiply(1000).plus(groupVal)
+                        n = n!!.multiply(1000).plus(groupVal)
                     }
                     ts.movePositionForwardBy(2)
                 }
                 if (ts[0].hasCategory("ordinal_suffix")) {
                     if (allowOrdinal) {
                         ts.movePositionForwardBy(1)
-                        n = n.withOrdinal(true)
+                        n = n!!.withOrdinal(true)
                     } else {
                         ts.position = originalPosition
                         return null
