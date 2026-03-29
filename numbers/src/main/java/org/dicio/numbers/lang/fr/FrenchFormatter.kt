@@ -18,13 +18,13 @@ class FrenchFormatter : Formatter("config/fr-fr") {
             }
 
             val denominatorString = when (mixedFraction.denominator) {
-                2 -> if (mixedFraction.numerator == 1L) "demi" else "demis"
-                4 -> if (mixedFraction.numerator == 1L) "quart" else "quarts"
+                2 -> if (mixedFraction.numerator == 1) "demi" else "demis"
+                4 -> if (mixedFraction.numerator == 1) "quart" else "quarts"
                 else -> {
                     val base = pronounceNumber(
                         mixedFraction.denominator.toDouble(), 0, true, false, true
                     )
-                    if (mixedFraction.numerator == 1L) base else base + "s"
+                    if (mixedFraction.numerator == 1) base else base + "s"
                 }
             }
 
