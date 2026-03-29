@@ -110,11 +110,9 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
     }
 
     fun numberPoint(allowOrdinal: Boolean): Number? {
-        var n = numberInteger(allowOrdinal).let {
-            if (it == null || it.isOrdinal) {
-                return@numberPoint it
-            }
-            it
+        var n = numberInteger(allowOrdinal) ?: return null
+        if (n.isOrdinal) {
+            return n
         }
 
         if (ts[0].hasCategory("point")) {
@@ -128,7 +126,7 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
             var magnitude = 0.1
             if (ts[0].value.length > 1 && NumberExtractorUtils.isRawNumber(ts[0])) {
                 for (i in 0 until ts[0].value.length) {
-                    n = n?.plus((ts[0].value[i].code - '0'.code) * magnitude)
+                    n = n.plus((ts[0].value[i].code - '0'.code) * magnitude)
                     magnitude /= 10.0
                 }
                 ts.movePositionForwardBy(1)
@@ -140,7 +138,7 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
                     ) {
                         val digitVal = ts[0].number
                         if (digitVal != null) {
-                            n = n?.plus(digitVal.multiply(magnitude))
+                            n = n.plus(digitVal.multiply(magnitude))
                         }
                         magnitude /= 10.0
                     } else {
@@ -159,7 +157,7 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
             if (denominator == null) {
                 ts.movePositionForwardBy(-separatorLength)
             } else {
-                n = n?.divide(denominator)
+                n = n.divide(denominator)
             }
         }
 
@@ -189,14 +187,14 @@ class FrenchNumberExtractor internal constructor(private val ts: TokenStream) {
                 ) {
                     val groupVal = ts[1].number
                     if (groupVal != null) {
-                        n = n?.multiply(1000)?.plus(groupVal)
+                        n = n.multiply(1000).plus(groupVal)
                     }
                     ts.movePositionForwardBy(2)
                 }
                 if (ts[0].hasCategory("ordinal_suffix")) {
                     if (allowOrdinal) {
                         ts.movePositionForwardBy(1)
-                        n = n?.withOrdinal(true)
+                        n = n.withOrdinal(true)
                     } else {
                         ts.position = originalPosition
                         return null
