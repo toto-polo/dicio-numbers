@@ -5,7 +5,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.dicio.numbers.test.TestUtils.F;
-import static org.dicio.numbers.test.TestUtils.T;
 import static org.junit.Assert.assertEquals;
 
 public class NiceNumberTest {
